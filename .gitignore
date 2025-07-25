@@ -4,6 +4,7 @@ node_modules/
 # Claves privadas
 app-tesis-backend/serviceAccountKey.json
 
+apptesis/google-services.json
 
 # Ignorar archivos de variables de entorno (¡MUY IMPORTANTE!)
 # Contienen secretos y contraseñas
