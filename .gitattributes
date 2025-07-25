@@ -1,0 +1,28 @@
+# Asegura finales de línea consistentes en todos los archivos de texto
+* text=auto
+
+# Fuerza LF en los archivos fuente (bueno para colaboración multiplataforma)
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.xml text eol=lf
+*.kt text eol=lf
+*.java text eol=lf
+*.gradle text eol=lf
+*.sh text eol=lf
+
+# Archivos binarios - sin conversión de EOL
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

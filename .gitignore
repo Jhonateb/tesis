@@ -1,0 +1,27 @@
+# Ignorar las carpetas de dependencias
+node_modules/
+
+# Claves privadas
+app-tesis-backend/serviceAccountKey.json
+
+
+# Ignorar archivos de variables de entorno (¡MUY IMPORTANTE!)
+# Contienen secretos y contraseñas
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignorar archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignorar carpetas de compilación (build)
+dist/
+build/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
