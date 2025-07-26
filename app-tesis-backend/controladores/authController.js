@@ -1,4 +1,3 @@
-// controllers/authController.js
 const admin = require('firebase-admin');
 const pool = require('../db');
 const jwt = require('jsonwebtoken');
@@ -55,7 +54,7 @@ exports.registerUser = async (req, res) => {
       password: contrasena,
       displayName: nombre_completo,
     });
-    
+
     const firebase_uid = userRecord.uid;
     const salt = await bcrypt.genSalt(10);
     const contrasena_hash = await bcrypt.hash(contrasena, salt);
@@ -66,7 +65,7 @@ exports.registerUser = async (req, res) => {
     );
 
     const nuevoUsuarioId = nuevoUsuario.rows[0].usuario_id;
-    
+
     await pool.query(
         "UPDATE usuarios SET usuario_ingreso = $1 WHERE usuario_id = $1",
         [nuevoUsuarioId]

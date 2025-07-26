@@ -11,7 +11,7 @@ import {
 import { EstilosLogin } from '../estilos/EstilosLogin';
 import { AntDesign } from '@expo/vector-icons';
 
-const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPressGoogle, onNavigateToRegister, mostrarContrasena, setMostrarContrasena }) => {
+const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPressGoogle, onNavigateToRegister, mostrarContrasena, setMostrarContrasena, loading }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={EstilosLogin.contenedor}>
@@ -26,6 +26,7 @@ const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPres
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            editable={!loading}
           />
         </View>
 
@@ -38,8 +39,9 @@ const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPres
               value={contrasena}
               onChangeText={setContrasena}
               secureTextEntry={!mostrarContrasena}
+              editable={!loading} 
             />
-            <TouchableOpacity onPress={() => setMostrarContrasena(!mostrarContrasena)}>
+            <TouchableOpacity onPress={() => setMostrarContrasena(!mostrarContrasena)} disabled={loading}>
               <AntDesign 
                 name={mostrarContrasena ? "eye" : "eyeo"} 
                 size={22} 
@@ -49,7 +51,7 @@ const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPres
           </View>
         </View>
         
-        <Button title="Entrar" onPress={onLogin} />
+        <Button title="Entrar" onPress={onLogin} disabled={loading} />
         
         <View style={EstilosLogin.separadorContenedor}>
           <View style={EstilosLogin.linea} />
@@ -57,12 +59,12 @@ const LoginView = ({ email, setEmail, contrasena, setContrasena, onLogin, onPres
           <View style={EstilosLogin.linea} />
         </View>
 
-        <TouchableOpacity style={EstilosLogin.botonGoogle} onPress={onPressGoogle}>
+        <TouchableOpacity style={[EstilosLogin.botonGoogle, loading && { opacity: 0.5 }]} onPress={onPressGoogle} disabled={loading}>
           <AntDesign name="google" size={24} style={EstilosLogin.iconoGoogle} />
           <Text style={EstilosLogin.textoBotonGoogle}>Continuar con Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={onNavigateToRegister} style={{ marginTop: 25 }}>
+        <TouchableOpacity onPress={onNavigateToRegister} style={{ marginTop: 25 }} disabled={loading}>
           <Text style={{ color: '#4a90e2', fontWeight: 'bold' }}>
             ¿No tienes una cuenta? Regístrate
           </Text>
