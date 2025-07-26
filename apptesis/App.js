@@ -17,7 +17,7 @@ export default function App() {
       setUser(user);
       if (initializing) setInitializing(false);
     });
-    return subscriber; // Se desuscribe al desmontar
+    return subscriber; 
   }, []);
 
   if (initializing) return null;
