@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+// App.js
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import NavegadorPrincipal from './src/navegacion/NavegadorPrincipal';
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import MenuTabs from './src/navegacion/MenuTabs';
-import NavegadorAuth from './src/navegacion/NavegadorAuth';
-
-const auth = getAuth();
 
 export default function App() {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-
-  useEffect(() => {
-    const subscriber = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      if (initializing) setInitializing(false);
-    });
-    return subscriber; 
-  }, []);
-
-  if (initializing) return null;
-
   return (
-    <NavigationContainer>
-      {user ? <MenuTabs /> : <NavegadorAuth />}
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <NavegadorPrincipal />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }

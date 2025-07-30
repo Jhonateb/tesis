@@ -1,14 +1,13 @@
-// En tu archivo client.js del front-end
+
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Necesitarás esta librería
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 const apiClient = axios.create({
   baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
 
-// Esto intercepta cada petición y le añade el token si existe
 apiClient.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('token'); // Asume que guardas el token con la clave 'token'
+  const token = await AsyncStorage.getItem('token'); 
   if (token) {
     config.headers['x-auth-token'] = token;
   }

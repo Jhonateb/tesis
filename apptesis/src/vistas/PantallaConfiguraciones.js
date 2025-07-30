@@ -1,86 +1,163 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
-// --- AÑADIDO: Importaciones para cerrar sesión ---
+// /vistas/PantallaConfiguraciones.js
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator, FlatList, SafeAreaView, StatusBar   } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { getAuth } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from '../api/client';
 
 const Icono = ({ children }) => <Text style={styles.icono}>{children}</Text>;
 
-const PantallaConfiguraciones = () => {
+const PantallaConfiguraciones = ({ navigation }) => {
+  const [loading, setLoading] = useState(true);
+  const [datosUsuario, setDatosUsuario] = useState(null);
+  const [misGrupos, setMisGrupos] = useState([]);
 
-  const codigoGrupo = "AB7DE2";
-  const nombreUsuario = "Jhonatan Tebalan";
-  const emailUsuario = "jhonatan.tebalan@email.com";
-  const esAdmin = true;
+  useFocusEffect(
+    React.useCallback(() => {
+      const cargarDatos = async () => {
+        setLoading(true);
+        try {
+          const [datosInicio, datosGrupos] = await Promise.all([
+            apiClient.get('/grupos/inicio'),
+            apiClient.get('/grupos/mis-grupos')
+          ]);
+          setDatosUsuario(datosInicio.data);
+          setMisGrupos(datosGrupos.data);
+        } catch (error) {
+          console.error("Error cargando datos:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      cargarDatos();
+    }, [])
+  );
 
-  // --- AÑADIDO: Función para manejar el cierre de sesión ---
+  const handleSwitchGroup = async (nuevoGrupoId) => {
+    if (nuevoGrupoId === datosUsuario.grupo_activo_id) return;
+    try {
+      await apiClient.post('/grupos/cambiar-activo', { grupo_id: nuevoGrupoId });
+      navigation.replace('App');
+    } catch (error) {
+      Alert.alert("Error", "No se pudo cambiar de grupo.");
+    }
+  };
+
   const handleLogout = async () => {
     try {
-      // Cierra la sesión de Google
-      await GoogleSignin.signOut();
-      // Cierra la sesión de Firebase
       await getAuth().signOut();
+      await GoogleSignin.signOut();
+      await AsyncStorage.removeItem('token');
+      navigation.replace('Auth');
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
       Alert.alert("Error", "No se pudo cerrar la sesión.");
     }
   };
 
+  const handleLeaveGroup = () => {
+    Alert.alert(
+      "Salir del Grupo",
+      "¿Estás seguro de que quieres salir del grupo actual?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Sí, Salir",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await apiClient.delete('/grupos/salirse');
+              navigation.replace('App');
+            } catch (error) {
+              Alert.alert("Error", error.response?.data?.msg || "No se pudo salir del grupo.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const renderGrupoItem = ({ item }) => {
+    const esActivo = item.grupo_id === item.grupo_activo_id;
+    return (
+      <TouchableOpacity 
+        style={[styles.opcion, esActivo && styles.opcionActiva]}
+        onPress={() => handleSwitchGroup(item.grupo_id)}
+      >
+        <Icono>{esActivo ? '🔘' : '⚪️'}</Icono>
+        <View>
+          <Text style={[styles.textoOpcion, esActivo && styles.textoActivo]}>{item.nombre}</Text>
+          <Text style={esActivo ? styles.textoActivo : null}>Tu rol: {item.nombre_rol}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  if (loading) {
+    return <View style={styles.contenedorCarga}><ActivityIndicator size="large" /></View>;
+  }
+
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+      <StatusBar 
+        barStyle="dark-content" 
+        backgroundColor="#f5f5f5" 
+      />
     <ScrollView style={styles.contenedor}>
       <Text style={styles.titulo}>Configuraciones</Text>
 
       <View style={styles.seccion}>
         <Text style={styles.subtitulo}>Mi Perfil</Text>
-        <TouchableOpacity style={styles.opcion}>
+        <View style={styles.opcion}>
           <Icono>👤</Icono>
           <View>
-            <Text style={styles.textoOpcion}>{nombreUsuario}</Text>
-            <Text>{emailUsuario}</Text>
+            <Text style={styles.textoOpcion}>{datosUsuario?.nombre_completo}</Text>
+            <Text>{datosUsuario?.email}</Text>
           </View>
-        </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.seccion}>
-        <Text style={styles.subtitulo}>Gestión de Grupos</Text>
-        
-        <TouchableOpacity style={styles.opcion}>
-          <Icono>➕</Icono>
-          <Text style={styles.textoOpcion}>Unirse a otro grupo con código</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.opcion}>
-          <Icono>🔄</Icono>
-          <Text style={styles.textoOpcion}>Cambiar de grupo</Text>
-        </TouchableOpacity>
-        
-        {esAdmin && (
-          <View style={styles.tarjetaCodigo}>
-            <Text style={styles.textoTarjeta}>Código del grupo actual:</Text>
-            <Text style={styles.codigo}>{codigoGrupo}</Text>
-          </View>
-        )}
+        <Text style={styles.subtitulo}>Mis Grupos</Text>
+        <FlatList
+          data={misGrupos}
+          renderItem={renderGrupoItem}
+          keyExtractor={(item) => item.grupo_id}
+          scrollEnabled={false} 
+        />
+      </View>
+      
+       <View style={styles.seccion}>
+        <Text style={styles.subtitulo}>Grupo Actual: {datosUsuario?.nombre_grupo}</Text>
+        <View style={styles.tarjetaCodigo}>
+          <Text style={styles.textoTarjeta}>Código de unión:</Text>
+          <Text style={styles.codigo}>{datosUsuario?.codigo_union}</Text>
+        </View>
       </View>
 
       <View style={styles.seccion}>
-         <TouchableOpacity style={[styles.opcion, styles.opcionSalir]}>
-          <Icono>🚪</Icono>
-          <Text style={[styles.textoOpcion, styles.textoSalir]}>Salirse del grupo actual</Text>
+         <TouchableOpacity style={[styles.opcion, styles.opcionSalir]} onPress={handleLeaveGroup}>
+          <Icono>🚪</Icono><Text style={[styles.textoOpcion, styles.textoSalir]}>Salirse del grupo actual</Text>
         </TouchableOpacity>
 
-        {/* --- AÑADIDO: Botón para Cerrar Sesión --- */}
-        <TouchableOpacity style={[styles.opcion, styles.opcionSalir]} onPress={handleLogout}>
-          <Icono>🔒</Icono>
-          <Text style={[styles.textoOpcion, styles.textoSalir]}>Cerrar Sesión</Text>
+         <TouchableOpacity style={[styles.opcion, styles.opcionSalir]} onPress={handleLogout}>
+          <Icono>🔒</Icono><Text style={[styles.textoOpcion, styles.textoSalir]}>Cerrar Sesión</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  contenedor: {
+  contenedorCarga: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  contenedor: {
     backgroundColor: '#f5f5f5',
   },
   titulo: {
@@ -120,7 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0eafc',
     borderRadius: 8,
     padding: 15,
-    margin: 20,
+    marginHorizontal: 20,
     alignItems: 'center',
   },
   textoTarjeta: {
@@ -139,7 +216,14 @@ const styles = StyleSheet.create({
   },
   textoSalir: {
     color: 'red',
-  }
+  },
+  opcionActiva: {
+    backgroundColor: '#e0eafc',
+  },
+  textoActivo: {
+    fontWeight: 'bold',
+    color: '#003366',
+  },
 });
 
 export default PantallaConfiguraciones;

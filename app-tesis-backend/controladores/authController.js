@@ -36,6 +36,7 @@ exports.googleLogin = async (req, res) => {
       res.json({ token });
     });
   } catch (err) {
+    console.error('Error en googleLogin:', err); 
     res.status(500).send('Error en el servidor');
   }
 };
