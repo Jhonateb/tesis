@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+// /vistas/UnirseCrearGrupoScreen.js
+
+import React, { useState, useRef } from 'react'; 
+import { View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { EstilosUnirseGrupo as styles } from '../estilos/EstilosUnirseGrupo';
 import apiClient from '../api/client';
 
 const UnirseCrearGrupoScreen = ({ navigation }) => {
   const [codigo, setCodigo] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null); 
 
   const handleUnirseGrupo = async () => {
-    if (!codigo) {
+    const codigoLimpio = codigo.trim();
+    if (!codigoLimpio) {
       Alert.alert('Campo Requerido', 'Por favor, ingresa un código de grupo.');
       return;
     }
     setLoading(true);
     try {
-      await apiClient.post('/grupos/unirse', { codigo_union: codigo });
+      await apiClient.post('/grupos/unirse', { codigo_union: codigoLimpio });
       Alert.alert('Éxito', 'Te has unido al grupo.', [
         { text: 'OK', onPress: () => navigation.replace('MainApp') }
       ]);
@@ -25,73 +30,60 @@ const UnirseCrearGrupoScreen = ({ navigation }) => {
     }
   };
 
+  const handleTextChange = (text) => {
+    setCodigo(text);
+    if (text === '') {
+      inputRef.current.blur();
+    }
+  };
+  
   const handleNavegarACrear = () => {
     navigation.navigate('CrearGrupo');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>No perteneces a ningún grupo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ingresa el código del grupo"
-        value={codigo}
-        onChangeText={setCodigo}
-        autoCapitalize="characters"
-      />
-      <Button title={loading ? "Uniéndose..." : "Unirse al Grupo"} onPress={handleUnirseGrupo} disabled={loading} />
-
-      <View style={styles.separatorContainer}>
-        <View style={styles.separator} />
-        <Text style={styles.separatorText}>O</Text>
-        <View style={styles.separator} />
+      <Text style={styles.titulo}>Únete a un Grupo</Text>
+      <Text style={styles.subtitulo}>Aún no formas parte de ninguna comunidad.</Text>
+      
+      <View style={styles.inputContenedor}>
+        <TextInput
+          ref={inputRef} 
+          style={styles.input}
+          placeholder="CÓDIGO"
+          value={codigo}
+          onChangeText={handleTextChange}
+          autoCapitalize="characters"
+          placeholderTextColor="#999"
+        />
       </View>
 
-      <Button
-        title="Crear un Nuevo Grupo"
+      <TouchableOpacity
+        style={[styles.botonPrimario, loading && styles.botonDeshabilitado]}
+        onPress={handleUnirseGrupo}
+        disabled={loading}
+      >
+        <Text style={styles.botonTexto}>
+          {loading ? "Uniéndose..." : "Unirse al Grupo"}
+        </Text>
+      </TouchableOpacity>
+      
+      <View style={styles.separadorContenedor}>
+        <View style={styles.linea} />
+        <Text style={styles.separadorTexto}>O</Text>
+        <View style={styles.linea} />
+      </View>
+
+      <TouchableOpacity
+        style={styles.botonSecundario}
         onPress={handleNavegarACrear}
-        color="#841584"
-      />
+      >
+        <Text style={styles.botonTextoSecundario}>
+          Crear un Nuevo Grupo
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5'
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  input: {
-    height: 45,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-  },
-  separatorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 30,
-  },
-  separator: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#ccc',
-  },
-  separatorText: {
-    marginHorizontal: 10,
-    color: '#888'
-  },
-});
 
 export default UnirseCrearGrupoScreen;
