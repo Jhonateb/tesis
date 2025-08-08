@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, Alert, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, Button, Alert, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Keyboard, SafeAreaView } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { EstilosRegistro } from '../estilos/EstilosRegistro';
@@ -41,7 +41,7 @@ const PantallaRegistro = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={EstilosRegistro.container}>
+      <SafeAreaView style={EstilosRegistro.container}>
         <Text style={EstilosRegistro.title}>Crear una Cuenta</Text>
         
         <TextInput
@@ -87,7 +87,7 @@ const PantallaRegistro = ({ navigation }) => {
         <TouchableOpacity style={EstilosRegistro.loginLink} onPress={() => navigation.goBack()} disabled={loading}>
           <Text style={EstilosRegistro.loginText}>¿Ya tienes una cuenta? Inicia Sesión</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
