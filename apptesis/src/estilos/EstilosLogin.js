@@ -1,101 +1,84 @@
-// EstilosLogin.js
-
 import { StyleSheet } from 'react-native';
-
-const colores = {
-  primario: '#4a90e2',
-  fondo: '#f7f8fa',
-  textoPrincipal: '#333333',
-  textoSecundario: '#7f8c8d',
-  blanco: '#ffffff',
-  grisClaro: '#ccc',
-};
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
 export const EstilosLogin = StyleSheet.create({
   contenedor: {
     flex: 1,
-    backgroundColor: colores.fondo,
+    backgroundColor: COLORS.fondo,
     justifyContent: 'center',
     paddingHorizontal: 30,
   },
   titulo: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    ...FONTS.h1,
     textAlign: 'center',
     marginBottom: 40,
-    color: colores.textoPrincipal
+    color: COLORS.textoPrincipal,
   },
-  
   inputContenedor: {
     width: '100%',
-    marginBottom: 20, 
+    marginBottom: 20,
   },
   inputLabel: {
-    fontSize: 16,
-    color: colores.textoSecundario,
+    fontSize: SIZES.body,
+    color: COLORS.textoSecundario,
     marginBottom: 8,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.blanco,
     width: '100%',
     padding: 15,
     borderRadius: 10,
-    fontSize: 16,
+    fontSize: SIZES.body,
     borderWidth: 1,
-    borderColor: '#ddd',
-    color: colores.textoPrincipal,
+    borderColor: COLORS.borde,
+    color: COLORS.textoPrincipal,
   },
-
-  // AGREGADO: Estilo para el contenedor que tiene el input y el ícono del ojo
   inputConIconoContenedor: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.blanco,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.borde,
     width: '100%',
   },
-  // AGREGADO: Estilo para el TextInput cuando está junto a un ícono
   inputConIcono: {
-    flex: 1, // Ocupa el espacio disponible
+    flex: 1,
     padding: 15,
-    fontSize: 16,
-    color: colores.textoPrincipal,
+    fontSize: SIZES.body,
+    color: COLORS.textoPrincipal,
   },
-  // AGREGADO: Estilo para el ícono del ojo
   iconoOjo: {
-    color: colores.textoSecundario,
-    padding: 15, // Aumenta el área táctil
+    color: COLORS.textoSecundario,
+    padding: 15,
   },
-
   separadorContenedor: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    marginVertical: 20, 
+    marginVertical: 20,
   },
   linea: {
     flex: 1,
     height: 1,
-    backgroundColor: colores.grisClaro,
+    backgroundColor: COLORS.grisClaro,
   },
   separadorTexto: {
     width: 50,
     textAlign: 'center',
-    color: colores.textoSecundario,
+    color: COLORS.textoSecundario,
     fontWeight: 'bold',
   },
   botonGoogle: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colores.blanco,
+    backgroundColor: COLORS.blanco,
     width: '100%',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: SIZES.radio,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -106,8 +89,13 @@ export const EstilosLogin = StyleSheet.create({
     marginRight: 15,
   },
   textoBotonGoogle: {
-    fontSize: 17,
+    fontSize: 17, 
     fontWeight: '500',
-    color: colores.textoPrincipal,
+    color: COLORS.textoPrincipal,
   },
+   linkTexto: {
+    color: COLORS.primario,
+    fontWeight: 'bold',
+  }
+
 });

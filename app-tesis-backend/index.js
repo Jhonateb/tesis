@@ -11,7 +11,7 @@ app.use(express.json());
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/grupos', require('./routes/grupos'));
+app.use('/api/anuncios', require('./routes/anuncios'));
 
-// Iniciar servidor
 app.listen(PORT, () => {
 });

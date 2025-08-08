@@ -1,69 +1,130 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useCallback } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+  SafeAreaView,
+} from 'react-native';
+import apiClient from '../api/client';
+import { useAuth } from '../hooks/useAuth';
+import { useApi } from '../hooks/useApi';
+import { EstilosAnuncios as styles } from '../estilos/EstilosAnuncios';
 
-const fakeAnnouncements = [
-  {
-    id: '1',
-    title: 'Ensayo General Ministerio de Alabanza',
-    date: '2025-07-25T19:00:00',
-    location: 'Salón Principal',
-  },
-  {
-    id: '2',
-    title: 'Reunión de Líderes',
-    date: '2025-07-28T20:00:00',
-    location: 'Oficina Pastoral',
-  },
-  {
-    id: '3',
-    title: 'Culto de Jóvenes',
-    date: '2025-08-01T18:30:00',
-    location: 'Anexo B',
-  },
-];
+const AnuncioCard = ({ item }) => {
+  const fecha = new Date(item.fecha_evento).toLocaleString('es-GT', {
+    dateStyle: 'long',
+    timeStyle: 'short',
+  });
 
-const PantallaAnuncios = () => {
-  const renderItem = ({ item }) => (
+  const handleAddToCalendar = () => {
+    alert(`Próximamente: Añadir "${item.titulo}" al calendario.`);
+  };
+
+  return (
     <View style={styles.announcementCard}>
-      <Text style={styles.announcementTitle}>{item.title}</Text>
-      <Text>Fecha: {new Date(item.date).toLocaleString()}</Text>
-      <Text>Lugar: {item.location}</Text>
-      <TouchableOpacity style={styles.calendarButton}>
+      <Text style={styles.announcementTitle}>{item.titulo}</Text>
+      <Text style={styles.announcementDescription}>{item.descripcion}</Text>
+      <View style={styles.detailsContainer}>
+        <Text style={styles.detailText}>🗓️ Fecha: {fecha}</Text>
+        {item.ubicacion && (
+          <Text style={styles.detailText}>📍 Lugar: {item.ubicacion}</Text>
+        )}
+      </View>
+      <TouchableOpacity
+        style={styles.calendarButton}
+        onPress={handleAddToCalendar}
+      >
         <Text style={styles.buttonText}>Añadir al Calendario</Text>
       </TouchableOpacity>
     </View>
   );
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Anuncios</Text>
-      <FlatList
-        data={fakeAnnouncements}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-      />
-    </View>
-  );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 40, paddingHorizontal: 20 },
-  header: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
-  announcementCard: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-  },
-  announcementTitle: { fontSize: 18, fontWeight: 'bold' },
-  calendarButton: {
-    backgroundColor: '#007bff',
-    padding: 10,
-    marginTop: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: { color: '#ffffff' },
-});
+const PantallaAnuncios = ({ navigation }) => {
+  const { usuario } = useAuth();
+  const {
+    data: anuncios,
+    loading,
+    error,
+    request: fetchAnuncios,
+  } = useApi(() => apiClient.get('/anuncios'));
+
+  const onRefresh = useCallback(() => {
+    fetchAnuncios();
+  }, []);
+
+  const renderContent = () => {
+    if (loading && !anuncios) {
+      return (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={styles.crearButton.backgroundColor} />
+        </View>
+      );
+    }
+
+    if (error && !anuncios) {
+      return (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>No se pudieron cargar los anuncios.</Text>
+          <TouchableOpacity onPress={onRefresh}>
+            <Text style={{ color: styles.crearButton.backgroundColor }}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    if (anuncios?.length === 0) {
+      return (
+        <View style={styles.centered}>
+          <Text>No hay anuncios disponibles por ahora.</Text>
+        </View>
+      );
+    }
+
+    return (
+      <FlatList
+        data={anuncios || []}
+        renderItem={({ item }) => <AnuncioCard item={item} />}
+        keyExtractor={(item) => item.anuncio_id.toString()}
+        contentContainerStyle={{ paddingBottom: 20 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={onRefresh}
+            colors={[styles.crearButton.backgroundColor]}
+          />
+        }
+      />
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Anuncios</Text>
+        <View style={styles.actionsContainer}>
+          {usuario?.rol_id === 1 && (
+            <TouchableOpacity
+              style={styles.manageButton}
+              onPress={() => navigation.navigate('GestionAnuncios')}
+            >
+              <Text style={styles.manageButtonText}>Gestionar</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.crearButton}
+            onPress={() => navigation.navigate('CrearAnuncio')}
+          >
+            <Text style={styles.crearButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      {renderContent()}
+    </SafeAreaView>
+  );
+};
 
 export default PantallaAnuncios;

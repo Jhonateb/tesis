@@ -4,7 +4,7 @@ const { customAlphabet } = require('nanoid');
 
 exports.verificarGrupoUsuario = async (req, res) => {
   try {
-    const { id: usuario_id } = req.usuario; 
+    const { id: usuario_id } = req.usuario;
 
     const grupoUsuario = await pool.query(
       `SELECT g.grupo_id, g.nombre, mg.rol_id 
@@ -27,71 +27,73 @@ exports.verificarGrupoUsuario = async (req, res) => {
 };
 
 exports.unirseAGrupo = async (req, res) => {
-    const { codigo_union } = req.body;
-    const { id: usuario_id } = req.usuario;
-    const ROL_MIEMBRO_REGULAR = 4; 
+  const { codigo_union } = req.body;
+  const { id: usuario_id } = req.usuario;
+  const ROL_MIEMBRO_REGULAR = 4;
 
-    try {
-        const grupo = await pool.query("SELECT grupo_id FROM grupos WHERE codigo_union = $1 AND estado = true", [codigo_union]);
+  try {
+    const grupo = await pool.query("SELECT grupo_id FROM grupos WHERE codigo_union = $1 AND estado = true", [codigo_union]);
 
-        if (grupo.rows.length === 0) {
-            return res.status(404).json({ msg: 'El código del grupo no es válido o el grupo no existe.' });
-        }
-
-        const grupo_id = grupo.rows[0].grupo_id;
-
-        await pool.query(
-            "INSERT INTO miembros_grupo (usuario_id, grupo_id, rol_id) VALUES ($1, $2, $3)",
-            [usuario_id, grupo_id, ROL_MIEMBRO_REGULAR]
-        );
-
-        res.json({ msg: 'Te has unido al grupo exitosamente.' });
-
-    } catch (err) {
-        if (err.code === '23505') { 
-            return res.status(400).json({ msg: 'Ya eres miembro de este grupo.' });
-        }
-        console.error(err.message);
-        res.status(500).send('Error en el servidor');
+    if (grupo.rows.length === 0) {
+      return res.status(404).json({ msg: 'El código del grupo no es válido o el grupo no existe.' });
     }
+
+    const grupo_id = grupo.rows[0].grupo_id;
+
+    await pool.query(
+      "INSERT INTO miembros_grupo (usuario_id, grupo_id, rol_id) VALUES ($1, $2, $3)",
+      [usuario_id, grupo_id, ROL_MIEMBRO_REGULAR]
+    );
+    await pool.query("UPDATE usuarios SET grupo_activo_id = $1 WHERE usuario_id = $2", [grupo_id, usuario_id]);
+
+    res.json({ msg: 'Te has unido al grupo exitosamente.' });
+
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(400).json({ msg: 'Ya eres miembro de este grupo.' });
+    }
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
 };
 
 
 exports.crearGrupo = async (req, res) => {
-    const { nombre, descripcion } = req.body;
-    const { id: propietario_id } = req.usuario;
-    const ROL_ADMINISTRADOR = 1; 
+  const { nombre, descripcion } = req.body;
+  const { id: propietario_id } = req.usuario;
+  const ROL_ADMINISTRADOR = 1;
 
-    const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8);
-    const codigo_union = nanoid();
+  const nanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8);
+  const codigo_union = nanoid();
 
-    const client = await pool.connect();
+  const client = await pool.connect();
 
-    try {
-        await client.query('BEGIN'); 
+  try {
+    await client.query('BEGIN');
 
-        const nuevoGrupo = await client.query(
-            "INSERT INTO grupos (nombre, descripcion, propietario_id, codigo_union, usuario_ingreso) VALUES ($1, $2, $3, $4, $3) RETURNING grupo_id",
-            [nombre, descripcion, propietario_id, codigo_union]
-        );
-        const grupo_id = nuevoGrupo.rows[0].grupo_id;
+    const nuevoGrupo = await client.query(
+      "INSERT INTO grupos (nombre, descripcion, propietario_id, codigo_union, usuario_ingreso) VALUES ($1, $2, $3, $4, $3) RETURNING grupo_id",
+      [nombre, descripcion, propietario_id, codigo_union]
+    );
+    const grupo_id = nuevoGrupo.rows[0].grupo_id;
 
-        await client.query(
-            "INSERT INTO miembros_grupo (usuario_id, grupo_id, rol_id) VALUES ($1, $2, $3)",
-            [propietario_id, grupo_id, ROL_ADMINISTRADOR]
-        );
+    await client.query(
+      "INSERT INTO miembros_grupo (usuario_id, grupo_id, rol_id) VALUES ($1, $2, $3)",
+      [propietario_id, grupo_id, ROL_ADMINISTRADOR]
+    );
+    await client.query("UPDATE usuarios SET grupo_activo_id = $1 WHERE usuario_id = $2", [grupo_id, propietario_id]);
 
-        await client.query('COMMIT'); 
+    await client.query('COMMIT');
 
-        res.status(201).json({ msg: 'Grupo creado exitosamente', grupo_id, codigo_union });
+    res.status(201).json({ msg: 'Grupo creado exitosamente', grupo_id, codigo_union });
 
-    } catch (err) {
-        await client.query('ROLLBACK');
-        console.error(err.message);
-        res.status(500).send('Error en el servidor');
-    } finally {
-        client.release();
-    }
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  } finally {
+    client.release();
+  }
 };
 
 exports.obtenerDatosInicio = async (req, res) => {
@@ -103,18 +105,25 @@ exports.obtenerDatosInicio = async (req, res) => {
         u.nombre_completo,
         u.email,
         g.nombre as nombre_grupo,
-        g.codigo_union
+        g.codigo_union,
+        mg.rol_id, 
+        r.nombre_rol 
       FROM miembros_grupo as mg
       JOIN usuarios as u ON mg.usuario_id = u.usuario_id
       JOIN grupos as g ON mg.grupo_id = g.grupo_id
+      JOIN roles as r ON mg.rol_id = r.rol_id 
       WHERE mg.usuario_id = $1 AND mg.estado = true
     `;
-
 
     const resultado = await pool.query(query, [usuario_id]);
 
     if (resultado.rows.length === 0) {
-      return res.status(404).json({ msg: 'No se encontraron datos de grupo para el usuario.' });
+
+      const datosUsuario = await pool.query("SELECT nombre_completo, email FROM usuarios WHERE usuario_id = $1", [usuario_id]);
+       if (datosUsuario.rows.length > 0) {
+         return res.json(datosUsuario.rows[0]);
+       }
+      return res.status(404).json({ msg: 'No se encontraron datos para el usuario.' });
     }
 
     res.json(resultado.rows[0]);

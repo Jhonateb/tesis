@@ -1,22 +1,12 @@
 // /vistas/AuthLoadingScreen.js
-import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 
-const auth = getAuth();
-
-const AuthLoadingScreen = ({ navigation }) => {
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      navigation.replace(user ? 'App' : 'Auth');
-    });
-
-    return unsubscribe;
-  }, []);
-
+const AuthLoadingScreen = () => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" />
+      <ActivityIndicator size="large" color="#007bff" />
+      <Text style={{ marginTop: 10 }}>Cargando...</Text>
     </View>
   );
 };

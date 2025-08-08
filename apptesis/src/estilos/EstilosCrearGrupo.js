@@ -1,44 +1,34 @@
 import { StyleSheet } from 'react-native';
-
-const colores = {
-  primario: '#4a90e2',
-  fondo: '#f7f8fa',
-  textoPrincipal: '#333333',
-  textoSecundario: '#7f8c8d',
-  borde: '#ddd',
-  blanco: '#ffffff',
-  deshabilitado: '#a9cbf5', 
-};
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
 export const EstilosCrearGrupo = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colores.fondo,
+    backgroundColor: COLORS.fondo,
     padding: 30,
   },
   titulo: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: colores.textoPrincipal,
+    ...FONTS.h2, 
+    color: COLORS.textoPrincipal, 
     textAlign: 'center',
     marginBottom: 40,
   },
   label: {
-    fontSize: 16,
-    color: colores.textoSecundario,
+    fontSize: SIZES.body, 
+    color: COLORS.textoSecundario,
     marginBottom: 8,
     fontWeight: '500',
   },
   input: {
-    backgroundColor: colores.blanco,
+    backgroundColor: COLORS.blanco, 
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 20,
-    fontSize: 16,
+    fontSize: SIZES.body, 
     borderWidth: 1,
-    borderColor: colores.borde,
-    color: colores.textoPrincipal,
+    borderColor: COLORS.borde, 
+    color: COLORS.textoPrincipal,
   },
   textArea: {
     height: 120, 
@@ -46,18 +36,18 @@ export const EstilosCrearGrupo = StyleSheet.create({
     paddingTop: 15,
   },
   boton: {
-    backgroundColor: colores.primario,
+    backgroundColor: COLORS.primario, 
     padding: 18,
-    borderRadius: 12,
+    borderRadius: SIZES.radio,
     alignItems: 'center',
     marginTop: 20,
   },
   botonTexto: {
-    color: colores.blanco,
+    color: COLORS.blanco,
     fontSize: 18,
     fontWeight: 'bold',
   },
   botonDeshabilitado: {
-    backgroundColor: colores.deshabilitado,
+    backgroundColor: COLORS.deshabilitado, 
   },
 });

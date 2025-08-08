@@ -1,65 +1,55 @@
 import { StyleSheet } from 'react-native';
-
-// --- AÑADIDO: Paleta de colores para consistencia ---
-const colores = {
-  primario: '#4a90e2',
-  fondo: '#f7f8fa',
-  textoPrincipal: '#333333',
-  textoSecundario: '#7f8c8d',
-};
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
 export const EstilosRegistro = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 30,
-    backgroundColor: colores.fondo,
+    backgroundColor: COLORS.fondo,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    ...FONTS.h1,
     textAlign: 'center',
     marginBottom: 40,
-    color: colores.textoPrincipal,
+    color: COLORS.textoPrincipal,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.blanco,
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginBottom: 20,
-    fontSize: 16,
+    fontSize: SIZES.body,
     borderWidth: 1,
-    borderColor: '#ddd',
-    color: colores.textoPrincipal, // <-- MODIFICADO: Se añade color
+    borderColor: COLORS.borde,
+    color: COLORS.textoPrincipal,
   },
-  // --- ESTILOS COPIADOS DE LOGIN PARA EL CAMPO DE CONTRASEÑA ---
   inputConIconoContenedor: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: COLORS.blanco,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
-    marginBottom: 20, // Se mantiene el margen inferior
+    borderColor: COLORS.borde,
+    marginBottom: 20,
   },
   inputConIcono: {
     flex: 1,
     padding: 15,
-    fontSize: 16,
-    color: colores.textoPrincipal,
+    fontSize: SIZES.body,
+    color: COLORS.textoPrincipal,
   },
   iconoOjo: {
-    color: colores.textoSecundario,
+    color: COLORS.textoSecundario,
     padding: 15,
   },
-  // -------------------------------------------------------------
   loginLink: {
     marginTop: 25,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   loginText: {
-    color: colores.primario,
+    color: COLORS.primario,
     fontWeight: 'bold',
-  }
+  },
 });

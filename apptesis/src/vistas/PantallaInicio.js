@@ -1,9 +1,7 @@
 // /vistas/PantallaInicio.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Button, SafeAreaView } from 'react-native';
 import apiClient from '../api/client';
-
-
 
 const PantallaInicio = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -33,12 +31,14 @@ const PantallaInicio = ({ navigation }) => {
   }
 
   return (
+    <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <Text style={styles.title}>¡Bienvenido, {datos?.nombre_completo}!</Text>
       <Text style={styles.subtitle}>Estás en el grupo:</Text>
       <Text style={styles.groupName}>{datos?.nombre_grupo}</Text>
 
     </View>
+    </SafeAreaView>
   );
 };
 

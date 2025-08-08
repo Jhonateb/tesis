@@ -1,47 +1,33 @@
 import { StyleSheet } from 'react-native';
-
-const colores = {
-  primario: '#4a90e2',
-  secundario: '#50c878',
-  fondo: '#f7f8fa',
-  textoPrincipal: '#333333',
-  textoSecundario: '#7f8c8d',
-  borde: '#ddd',
-  blanco: '#ffffff',
-  grisClaro: '#ccc',
-  deshabilitado: '#a9cbf5',
-};
+import { COLORS, SIZES, FONTS } from '../theme/theme';
 
 export const EstilosUnirseGrupo = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     padding: 30,
-    backgroundColor: colores.fondo,
+    backgroundColor: COLORS.fondo,
   },
   titulo: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...FONTS.h2,
     textAlign: 'center',
     marginBottom: 15,
-    color: colores.textoPrincipal,
+    color: COLORS.textoPrincipal,
   },
   subtitulo: {
-    fontSize: 16,
+    fontSize: SIZES.body,
     textAlign: 'center',
-    color: colores.textoSecundario,
+    color: COLORS.textoSecundario,
     marginBottom: 40,
   },
-
-   inputContenedor: {
-    backgroundColor: '#ffffff',
+  inputContenedor: {
+    backgroundColor: COLORS.blanco,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.borde,
     marginBottom: 20,
-    height: 55, 
+    height: 55,
   },
-
   input: {
     position: 'absolute',
     top: 0,
@@ -49,26 +35,24 @@ export const EstilosUnirseGrupo = StyleSheet.create({
     left: 0,
     right: 0,
     fontSize: 18,
-    color: '#333333',
+    color: COLORS.textoPrincipal,
     textAlign: 'center',
     fontWeight: 'bold',
     letterSpacing: 3,
   },
-
-
   botonPrimario: {
-    backgroundColor: colores.primario,
+    backgroundColor: COLORS.primario,
     padding: 18,
-    borderRadius: 12,
+    borderRadius: SIZES.radio,
     alignItems: 'center',
   },
   botonTexto: {
-    color: colores.blanco,
+    color: COLORS.blanco,
     fontSize: 18,
     fontWeight: 'bold',
   },
   botonDeshabilitado: {
-    backgroundColor: colores.deshabilitado,
+    backgroundColor: COLORS.deshabilitado,
   },
   separadorContenedor: {
     flexDirection: 'row',
@@ -78,24 +62,24 @@ export const EstilosUnirseGrupo = StyleSheet.create({
   linea: {
     flex: 1,
     height: 1,
-    backgroundColor: colores.grisClaro,
+    backgroundColor: COLORS.grisClaro,
   },
   separadorTexto: {
     width: 50,
     textAlign: 'center',
-    color: colores.textoSecundario,
+    color: COLORS.textoSecundario,
     fontWeight: 'bold',
   },
   botonSecundario: {
     backgroundColor: 'transparent',
-    borderColor: colores.primario,
+    borderColor: COLORS.primario,
     borderWidth: 2,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: SIZES.radio,
     alignItems: 'center',
   },
   botonTextoSecundario: {
-    color: colores.primario,
+    color: COLORS.primario,
     fontSize: 18,
     fontWeight: 'bold',
   },

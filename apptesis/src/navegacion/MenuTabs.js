@@ -1,13 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
-
 import PantallaInicio from '../vistas/PantallaInicio.js';
 import PantallaCalendario from '../vistas/PantallaCalendario.js';
-import PantallaAnuncios from '../vistas/PantallaAnuncios.js';
 import PantallaConfiguraciones from '../vistas/PantallaConfiguraciones.js';
-
 import NavegadorProyeccion  from './NavegadorProyeccion.js';
+import NavegadorAnuncios from './NavegadorAnuncios';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,7 +31,7 @@ const MenuTabs = () => {
             />
             <Tab.Screen
                 name="Anuncios"
-                component={PantallaAnuncios}
+                component={NavegadorAnuncios}
                 options={{ tabBarIcon: () => Icono('📢') }}
             />
             <Tab.Screen

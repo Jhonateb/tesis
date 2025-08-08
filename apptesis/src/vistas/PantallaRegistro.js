@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
-import { 
-  View, Text, TextInput, Button, Alert, TouchableOpacity, 
-  TouchableWithoutFeedback, Keyboard, ActivityIndicator 
-} from 'react-native';
-import { AntDesign } from '@expo/vector-icons'; 
-import apiClient from '../api/client';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, Button, Alert, ActivityIndicator, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { AntDesign } from '@expo/vector-icons';
+import { AuthContext } from '../context/AuthContext';
 import { EstilosRegistro } from '../estilos/EstilosRegistro';
 
 const PantallaRegistro = ({ navigation }) => {
@@ -12,35 +9,25 @@ const PantallaRegistro = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mostrarContrasena, setMostrarContrasena] = useState(false);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const { register } = useContext(AuthContext);
 
   const handleRegister = async () => {
-    if (loading) return; 
-
     if (!nombre || !email || !contrasena) {
-      Alert.alert('Campos incompletos', 'Por favor, completa todos los campos.');
-      return;
+      return Alert.alert('Campos incompletos', 'Por favor, completa todos los campos.');
     }
+    setLoading(true);
+    const resultado = await register(nombre, email, contrasena);
+    setLoading(false);
 
-    setLoading(true); 
-    try {
-      await apiClient.post('/auth/register', {
-        nombre_completo: nombre,
-        email: email,
-        contrasena: contrasena
-      });
-
+    if (resultado === true) {
       Alert.alert(
         'Registro Exitoso',
         'Tu cuenta ha sido creada. Ahora, por favor, inicia sesión.',
         [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
       );
-
-    } catch (error) {
-      const msg = error.response?.data?.msg || 'No se pudo completar el registro.';
-      Alert.alert('Error de Registro', msg);
-    } finally {
-      setLoading(false); 
+    } else {
+      Alert.alert('Error de Registro', resultado); 
     }
   };
 

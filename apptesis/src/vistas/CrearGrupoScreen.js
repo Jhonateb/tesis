@@ -1,34 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
-import { EstilosCrearGrupo as styles } from '../estilos/EstilosCrearGrupo'; 
-import apiClient from '../api/client';
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
+import { EstilosCrearGrupo as styles } from '../estilos/EstilosCrearGrupo';
+import { useAuth } from '../hooks/useAuth';
 
 const CrearGrupoScreen = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [loading, setLoading] = useState(false);
+  const { crearGrupo } = useAuth();
 
   const handleCrearGrupo = async () => {
     if (!nombre) {
-      Alert.alert('Campo Requerido', 'El nombre del grupo es obligatorio.');
-      return;
+      return Alert.alert(
+        'Campo Requerido',
+        'El nombre del grupo es obligatorio.'
+      );
     }
     setLoading(true);
-    try {
-      await apiClient.post('/grupos/crear', { nombre, descripcion });
-      Alert.alert('Éxito', 'El grupo ha sido creado.', [
-        { text: 'OK', onPress: () => navigation.replace('MainApp') }
-      ]);
-    } catch (error) {
-      const msg = error.response?.data?.msg || 'No se pudo crear el grupo.';
-      Alert.alert('Error', msg);
-    } finally {
-      setLoading(false);
+    const resultado = await crearGrupo(nombre, descripcion);
+    setLoading(false);
+
+    if (resultado !== true) {
+      Alert.alert('Error', resultado);
     }
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.titulo}>Crear un Nuevo Grupo</Text>
 
       <Text style={styles.label}>Nombre del Grupo</Text>
@@ -38,6 +43,7 @@ const CrearGrupoScreen = ({ navigation }) => {
         value={nombre}
         onChangeText={setNombre}
         placeholderTextColor="#999"
+        editable={!loading}
       />
 
       <Text style={styles.label}>Descripción (Opcional)</Text>
@@ -48,18 +54,18 @@ const CrearGrupoScreen = ({ navigation }) => {
         onChangeText={setDescripcion}
         multiline
         placeholderTextColor="#999"
+        editable={!loading}
       />
-
       <TouchableOpacity
         style={[styles.boton, loading && styles.botonDeshabilitado]}
         onPress={handleCrearGrupo}
         disabled={loading}
       >
         <Text style={styles.botonTexto}>
-          {loading ? "Creando..." : "Crear Grupo"}
+          {loading ? 'Creando...' : 'Crear Grupo'}
         </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
