@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            const firebaseToken = await auth.currentUser.getIdToken();
-            const { data } = await apiClient.post('/auth/login', { firebaseToken });
+            const idToken = await auth.currentUser.getIdToken(); 
+            const { data } = await apiClient.post('/auth/login', { idToken }); 
             await AsyncStorage.setItem('token', data.token);
             return await cargarDatosUsuarioYGrupo();
         } catch (error) {
@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
             return false;
         }
     };
-
     const loginConGoogle = async () => {
         try {
             await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
